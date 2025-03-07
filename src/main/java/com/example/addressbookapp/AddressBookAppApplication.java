@@ -14,7 +14,7 @@ public class AddressBookAppApplication {
 		String activeProfile = context.getEnvironment().getActiveProfiles().length > 0
 				? context.getEnvironment().getActiveProfiles()[0]
 				: "default";
-		log.info("Employee Payroll App Started in {} environment", activeProfile);
+		log.info("Address Book App Started in {} environment", activeProfile);
 	}
 
 }
