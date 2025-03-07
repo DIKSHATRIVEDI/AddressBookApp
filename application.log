@@ -19,3 +19,9 @@
 2025-03-07T17:03:58.030+05:30  WARN 9524 --- [AddressBookApp] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : Unable to start LiveReload server
 2025-03-07T17:03:58.076+05:30  INFO 9524 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Started AddressBookAppApplication in 4.239 seconds (process running for 4.684)
 2025-03-07T17:03:58.081+05:30  INFO 9524 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Address Book App Started in dev environment
+2025-03-07T19:47:31.595+05:30  INFO 6780 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Starting AddressBookAppApplication using Java 23.0.2 with PID 6780 (D:\SpringBoot\addressbookapp\target\classes started by root in D:\SpringBoot\addressbookapp)
+2025-03-07T19:47:32.163+05:30 DEBUG 6780 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-03-07T19:47:32.164+05:30  INFO 6780 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : The following 1 profile is active: "dev"
+2025-03-07T19:47:39.515+05:30  WARN 6780 --- [AddressBookApp] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-03-07T19:47:40.400+05:30  INFO 6780 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Started AddressBookAppApplication in 9.746 seconds (process running for 10.801)
+2025-03-07T19:47:40.406+05:30  INFO 6780 --- [AddressBookApp] [restartedMain] c.e.a.AddressBookAppApplication          : Address Book App Started in dev environment

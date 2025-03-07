@@ -1,5 +1,6 @@
 package com.example.addressbookapp.service;
 
+import com.example.addressbookapp.Exception.AddressBookException;
 import com.example.addressbookapp.Interface.IAddressBookService;
 import com.example.addressbookapp.dto.AddressBookDTO;
 import com.example.addressbookapp.model.AddressBook;
@@ -7,8 +8,6 @@ import com.example.addressbookapp.repository.AddressBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class AddressBookService implements IAddressBookService {
@@ -29,25 +28,26 @@ public class AddressBookService implements IAddressBookService {
 
     @Override
     public AddressBook getEntryById(Long id) {
-        return addressBookRepository.findById(id).orElse(null);
+        return addressBookRepository.findById(id)
+                .orElseThrow(() -> new AddressBookException("Employee with ID " + id + " not found"));
     }
 
     @Override
     public AddressBook updateEntry(Long id, AddressBookDTO dto) {
-        Optional<AddressBook> existingEntry = addressBookRepository.findById(id);
+        AddressBook addressBook = addressBookRepository.findById(id)
+                .orElseThrow(() -> new AddressBookException("Address Book entry with ID " + id + " not found"));
+        addressBook.setName(dto.getName());
+        addressBook.setEmail(dto.getEmail());
+        addressBook.setPhoneNumber(dto.getPhoneNumber());
 
-        if (existingEntry.isPresent()) {
-            AddressBook updatedEntry = existingEntry.get();
-            updatedEntry.setName(dto.getName());
-            updatedEntry.setEmail(dto.getEmail());
-            updatedEntry.setPhoneNumber(dto.getPhoneNumber());
-            return addressBookRepository.save(updatedEntry);
-        }
-        return null;
+        return addressBookRepository.save(addressBook);
     }
 
     @Override
     public void deleteEntry(Long id) {
+        if (!addressBookRepository.existsById(id)) {
+            throw new AddressBookException("Entry with ID " + id + " not found");
+        }
         addressBookRepository.deleteById(id);
     }
 }
