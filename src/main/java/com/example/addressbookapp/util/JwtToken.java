@@ -56,4 +56,13 @@ public class JwtToken{
         activeTokens.remove(userId);
     }
 
+    // New methods to get the current user ID and token
+    public Long getCurrentUserId(String token) {
+        return decodeToken(token); // Extracts the user ID from the token
+    }
+
+    public String getCurrentToken(Long userId) {
+        return activeTokens.get(userId); // Retrieves the token for a logged-in user
+    }
+
 }
