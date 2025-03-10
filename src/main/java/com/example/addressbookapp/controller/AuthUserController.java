@@ -1,6 +1,7 @@
 package com.example.addressbookapp.controller;
 
 import com.example.addressbookapp.dto.AuthUserDTO;
+import com.example.addressbookapp.dto.ForgetPasswordDTO;
 import com.example.addressbookapp.dto.LoginDTO;
 import com.example.addressbookapp.dto.ResponseDTO;
 import com.example.addressbookapp.model.AuthUser;
@@ -30,6 +31,21 @@ public class AuthUserController {
         String result=authenticationService.login(loginDTO);
         ResponseDTO responseUserDTO=new ResponseDTO("Login successfully!!",result);
         return  new ResponseEntity<>(responseUserDTO,HttpStatus.OK);
+    }
+
+    @PutMapping("/forgetPassword/{email}")
+    public ResponseEntity<ResponseDTO> forgetPassword(@PathVariable String email,
+                                                      @Valid @RequestBody ForgetPasswordDTO forgetPasswordDTO) {
+        String response = authenticationService.forgetPassword(email, forgetPasswordDTO);
+        return new ResponseEntity<>(new ResponseDTO(response, null), HttpStatus.OK);
+    }
+
+    @PutMapping("/resetPassword/{email}")
+    public ResponseEntity<ResponseDTO> resetPassword(@PathVariable String email,
+                                                     @RequestParam String currentPassword,
+                                                     @RequestParam String newPassword) {
+        String response = authenticationService.resetPassword(email, currentPassword, newPassword);
+        return new ResponseEntity<>(new ResponseDTO(response, null), HttpStatus.OK);
     }
     
 }

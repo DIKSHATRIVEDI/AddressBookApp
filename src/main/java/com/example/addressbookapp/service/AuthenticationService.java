@@ -2,6 +2,7 @@ package com.example.addressbookapp.service;
 
 import com.example.addressbookapp.Interface.IAuthenticationService;
 import com.example.addressbookapp.dto.AuthUserDTO;
+import com.example.addressbookapp.dto.ForgetPasswordDTO;
 import com.example.addressbookapp.model.AuthUser;
 import com.example.addressbookapp.dto.LoginDTO;
 import com.example.addressbookapp.repository.AuthUserRepository;
@@ -90,5 +91,68 @@ public class AuthenticationService implements IAuthenticationService {
             return "Successfully logged out!";
         }
         return "User not logged in!";
+    }
+
+    public String forgetPassword(String email, ForgetPasswordDTO forgetPasswordDTO) {
+        try {
+            Optional<AuthUser> userOptional = Optional.ofNullable(authUserRepository.findByEmail(email));
+
+            if (!userOptional.isPresent()) {
+                return "Sorry! We cannot find the user email: " + email;
+            }
+
+            AuthUser user = userOptional.get();
+            String newPassword = forgetPasswordDTO.getPassword();
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+            authUserRepository.save(user);
+
+            try {
+                emailSenderService.sendEmail(
+                        user.getEmail(),
+                        "Password Changed Successfully!",
+                        "Hi " + user.getFirstName() + ",\n\nYour password has been successfully updated."
+                );
+            } catch (Exception emailException) {
+                System.err.println("Error sending email: " + emailException.getMessage());
+            }
+
+            return "Password has been changed successfully!";
+        } catch (Exception e) {
+            System.err.println("Forgot password failed: " + e.getMessage());
+            return "Failed to reset password due to a system error.";
+        }
+    }
+    @Override
+    public String resetPassword(String email, String currentPassword, String newPassword) {
+        try {
+            AuthUser user = authUserRepository.findByEmail(email);
+            if (user == null) {
+                return "User not found with email: " + email;
+            }
+
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                return "Current password is incorrect!";
+            }
+
+            String encryptedPassword = passwordEncoder.encode(newPassword);
+            user.setPassword(encryptedPassword);
+            authUserRepository.save(user);
+
+            try {
+                emailSenderService.sendEmail(
+                        user.getEmail(),
+                        "Password Reset Successful",
+                        "Hi " + user.getFirstName() + ",\n\nYour password has been successfully updated!"
+                );
+            } catch (Exception emailException) {
+                System.err.println("Error sending email: " + emailException.getMessage());
+            }
+
+            return "Password reset successfully!";
+        } catch (Exception e) {
+            System.err.println("Reset password failed: " + e.getMessage());
+            return "Failed to reset password due to a system error.";
+        }
     }
 }
