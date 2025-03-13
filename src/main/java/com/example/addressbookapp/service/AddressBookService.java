@@ -7,6 +7,9 @@ import com.example.addressbookapp.repository.AddressBookRepository;
 import com.example.addressbookapp.util.JwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,7 @@ public class AddressBookService implements IAddressBookService {
     }
 
     @Override
+    @CacheEvict(value = "addressBookCache", allEntries = true) // Clear cache on new entry
     public AddressBook createAddressBookEntry(AddressBookDTO dto, String token) {
         Long userId = tokenUtil.getCurrentUserId(token);
         checkAuthentication(userId, token);
@@ -35,6 +39,7 @@ public class AddressBookService implements IAddressBookService {
     }
 
     @Override
+    @Cacheable(value = "addressBookCache") // Cache results
     public List<AddressBook> getAllEntries(String token) {
         Long userId = tokenUtil.getCurrentUserId(token);
         checkAuthentication(userId, token);
@@ -42,6 +47,7 @@ public class AddressBookService implements IAddressBookService {
     }
 
     @Override
+    @Cacheable(value = "addressBookCache", key = "#id") // Cache specific entry by ID
     public AddressBook getEntryById(Long id, String token) {
         Long userId = tokenUtil.getCurrentUserId(token);
         checkAuthentication(userId, token);
@@ -49,6 +55,10 @@ public class AddressBookService implements IAddressBookService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "addressBookCache", allEntries = true),
+            @CacheEvict(value = "addressBookCache", key = "#id")
+    })
     public AddressBook updateEntry(Long id, AddressBookDTO dto, String token) {
         Long userId = tokenUtil.getCurrentUserId(token);
         checkAuthentication(userId, token);
@@ -64,6 +74,7 @@ public class AddressBookService implements IAddressBookService {
     }
 
     @Override
+    @CacheEvict(value = "addressBookCache", key = "#id") // Remove from cache on delete
     public void deleteEntry(Long id, String token) {
         Long userId = tokenUtil.getCurrentUserId(token);
         checkAuthentication(userId, token);
