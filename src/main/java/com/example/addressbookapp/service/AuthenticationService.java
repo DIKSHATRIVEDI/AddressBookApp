@@ -10,6 +10,8 @@ import com.example.addressbookapp.util.JwtToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 
 import java.util.Optional;
 
@@ -24,6 +26,9 @@ public class AuthenticationService implements IAuthenticationService {
     @Autowired
     EmailSenderService emailSenderService;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
@@ -35,6 +40,8 @@ public class AuthenticationService implements IAuthenticationService {
             user.setPassword(encryptedPassword);
             String token = tokenUtil.createToken(user.getUserId());
             authUserRepository.save(user);
+            // Publish registration event
+            rabbitTemplate.convertAndSend("app.exchange", "user.register", user.getEmail());
 
             try {
                 emailSenderService.sendEmail(

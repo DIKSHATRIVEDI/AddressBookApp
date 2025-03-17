@@ -16,27 +16,27 @@ public class AddressBookController {
     private AddressBookService addressBookService;
 
     @PostMapping("/create")
-    public AddressBook createAddress(@RequestBody AddressBookDTO dto, @RequestParam String token) {
-        return addressBookService.createAddressBookEntry(dto, token);
+    public AddressBook createAddress(@RequestBody AddressBookDTO dto) {
+        return addressBookService.createAddressBookEntry(dto);
     }
 
     @GetMapping("/all")
-    public List<AddressBook> getAllEntries(@RequestParam String token) {
-        return addressBookService.getAllEntries(token);
+    public List<AddressBook> getAllEntries() {
+        return addressBookService.getAllEntries();
     }
 
     @GetMapping("/{id}")
-    public AddressBook getEntryById(@PathVariable Long id, @RequestParam String token) {
-        return addressBookService.getEntryById(id, token);
+    public AddressBook getEntryById(@PathVariable Long id) {
+        return addressBookService.getEntryById(id);
     }
 
     @PutMapping("/update/{id}")
-    public AddressBook updateEntry(@PathVariable Long id, @RequestBody AddressBookDTO dto, @RequestParam String token) {
-        return addressBookService.updateEntry(id, dto, token);
+    public AddressBook updateEntry(@PathVariable Long id, @RequestBody AddressBookDTO dto) {
+        return addressBookService.updateEntry(id, dto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteEntry(@PathVariable Long id, @RequestParam String token) {
-        addressBookService.deleteEntry(id, token);
+    public void deleteEntry(@PathVariable Long id) {
+        addressBookService.deleteEntry(id);
     }
 }
