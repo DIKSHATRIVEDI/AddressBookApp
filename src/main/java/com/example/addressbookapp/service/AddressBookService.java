@@ -35,8 +35,8 @@ public class AddressBookService implements IAddressBookService {
         Long userId = getCurrentUserId();
         AddressBook addressBook = new AddressBook(null, dto.getName(), dto.getEmail(), dto.getPhoneNumber());
 
-        // Publish contact added event
-        rabbitTemplate.convertAndSend("app.exchange", "contact.add", dto.getEmail());
+        // 🔔 Send RabbitMQ event for creating a contact
+        rabbitTemplate.convertAndSend("contactQueue", "New contact created: " + dto.getName());
 
         return addressBookRepository.save(addressBook);
     }
@@ -68,6 +68,10 @@ public class AddressBookService implements IAddressBookService {
             addressBook.setName(dto.getName());
             addressBook.setEmail(dto.getEmail());
             addressBook.setPhoneNumber(dto.getPhoneNumber());
+
+            // 🔔 Send RabbitMQ event for updating a contact
+            rabbitTemplate.convertAndSend("contactQueue", "Contact updated: " + dto.getName());
+
             return addressBookRepository.save(addressBook);
         }
         throw new RuntimeException("Entry with ID " + id + " not found");
@@ -79,6 +83,9 @@ public class AddressBookService implements IAddressBookService {
         getCurrentUserId(); // Ensure user is authenticated
         if (addressBookRepository.existsById(id)) {
             addressBookRepository.deleteById(id);
+
+            // 🔔 Send RabbitMQ event for deleting a contact
+            rabbitTemplate.convertAndSend("contactQueue", "Contact deleted with ID: " + id);
         } else {
             throw new RuntimeException("Entry with ID " + id + " not found");
         }

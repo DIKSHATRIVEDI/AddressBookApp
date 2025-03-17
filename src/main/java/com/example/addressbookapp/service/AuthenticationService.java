@@ -41,8 +41,6 @@ public class AuthenticationService implements IAuthenticationService {
             user.setPassword(encryptedPassword);
             String token = tokenUtil.createToken(user.getUserId());
             authUserRepository.save(user);
-            // Publish registration event
-            rabbitTemplate.convertAndSend("app.exchange", "user.register", user.getEmail());
 
             try {
                 emailSenderService.sendEmail(
@@ -55,6 +53,9 @@ public class AuthenticationService implements IAuthenticationService {
             } catch (Exception emailException) {
                 System.err.println("Error sending email: " + emailException.getMessage());
             }
+
+            String message = "User registered: " + user.getEmail();
+            rabbitTemplate.convertAndSend("userQueue", message);
 
             return user;
         } catch (Exception e) {
@@ -74,11 +75,15 @@ public class AuthenticationService implements IAuthenticationService {
                         emailSenderService.sendEmail(
                                 user.get().getEmail(),
                                 "Logged in Successfully!",
-                                "Hi " + user.get().getFirstName() + ",\n\nYou have successfully logged in into Greeting App!"
+                                "Hi " + user.get().getFirstName() + ",\n\nYou have successfully logged in into Address Book!"
                         );
                     } catch (Exception emailException) {
                         System.err.println("Error sending email: " + emailException.getMessage());
                     }
+
+                    String message = "User logged in: " + user.get().getEmail();
+                    rabbitTemplate.convertAndSend("loginQueue", message);
+
                     return "Congratulations!! You have logged in successfully!"+token;
                 } else {
                     return "Sorry! Email or Password is incorrect!";
@@ -124,6 +129,9 @@ public class AuthenticationService implements IAuthenticationService {
                 System.err.println("Error sending email: " + emailException.getMessage());
             }
 
+            String message = "Password reset for: " + email;
+            rabbitTemplate.convertAndSend("passwordQueue", message);
+
             return "Password has been changed successfully!";
         } catch (Exception e) {
             System.err.println("Forgot password failed: " + e.getMessage());
@@ -155,6 +163,9 @@ public class AuthenticationService implements IAuthenticationService {
             } catch (Exception emailException) {
                 System.err.println("Error sending email: " + emailException.getMessage());
             }
+
+            String message = "Password reset for: " + email;
+            rabbitTemplate.convertAndSend("passwordQueue", message);
 
             return "Password reset successfully!";
         } catch (Exception e) {
