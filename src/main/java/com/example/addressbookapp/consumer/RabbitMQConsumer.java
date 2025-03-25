@@ -12,7 +12,6 @@ public class RabbitMQConsumer {
     @RabbitListener(queues = "contactQueue")
     public void receiveMessage(String message) {
         System.out.println(" Received Message: " + message);
-        // Here, you can call an email service to send a notification
     }
     @Autowired
     EmailSenderService emailSenderService;

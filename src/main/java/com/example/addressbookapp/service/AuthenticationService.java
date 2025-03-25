@@ -45,7 +45,7 @@ public class AuthenticationService implements IAuthenticationService {
             try {
                 emailSenderService.sendEmail(
                         user.getEmail(),
-                        "Registered in Greeting App",
+                        "Registered in AddressBook app",
                         "Hi " + user.getFirstName() + ",\n\nYou have been successfully registered!\n\nYour details:\n\n" +
                                 "User Id: " + user.getUserId() + "\nFirst Name: " + user.getFirstName() + "\nLast Name: " + user.getLastName() +
                                 "\nEmail: " + user.getEmail() + "\nToken: " + token

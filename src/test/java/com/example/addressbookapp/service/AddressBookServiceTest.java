@@ -61,7 +61,7 @@ class AddressBookServiceTest {
         assertEquals("John Doe", result.getName());
         assertEquals("john@example.com", result.getEmail());
         assertEquals("1234567890", result.getPhoneNumber());
-        verify(rabbitTemplate).convertAndSend("app.exchange", "contact.add", "john@example.com");
+        verify(rabbitTemplate).convertAndSend("contactQueue", "New contact created: John Doe");
         verify(addressBookRepository).save(any(AddressBook.class));
     }
 

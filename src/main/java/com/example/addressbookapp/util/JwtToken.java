@@ -13,6 +13,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 @Component
 public class JwtToken{
@@ -27,6 +28,7 @@ public class JwtToken{
 
             String token = JWT.create()
                     .withClaim("user_id", id)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000)) // Expires after 5 minute
                     .sign(algorithm);
             activeTokens.put(id, token);
             return token;
@@ -40,7 +42,9 @@ public class JwtToken{
     }
     public Long decodeToken(String token) {
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).build();
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET))
+                    .acceptExpiresAt(0) // Accept token within the expiration time
+                    .build();
             DecodedJWT decodedJWT = verifier.verify(token);
             return decodedJWT.getClaim("user_id").asLong();
         } catch (JWTVerificationException e) {
@@ -49,7 +53,17 @@ public class JwtToken{
     }
 
     public boolean isUserLoggedIn(Long userId, String token) {
-        return activeTokens.containsKey(userId) && activeTokens.get(userId).equals(token);
+        try {
+            if (activeTokens.containsKey(userId) && activeTokens.get(userId).equals(token)) {
+                decodeToken(token); // Verifies if the token is still valid
+                return true;
+            }
+        } catch (Exception e) {
+            // If token is expired, remove it from the active tokens
+            activeTokens.remove(userId);
+        }
+        return false;
+        // return activeTokens.containsKey(userId) && activeTokens.get(userId).equals(token);
     }
 
     public void logoutUser(Long userId) {

@@ -25,17 +25,17 @@ public class AddressBookService implements IAddressBookService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private Long getCurrentUserId() {
-        return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
+//    private Long getCurrentUserId() {
+//        return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//    }
 
     @Override
     @CacheEvict(value = "addressBookCache", allEntries = true) // Clear cache on new entry
     public AddressBook createAddressBookEntry(AddressBookDTO dto) {
-        Long userId = getCurrentUserId();
+//        Long userId = getCurrentUserId();
         AddressBook addressBook = new AddressBook(null, dto.getName(), dto.getEmail(), dto.getPhoneNumber());
 
-        // 🔔 Send RabbitMQ event for creating a contact
+        // Send RabbitMQ event for creating a contact
         rabbitTemplate.convertAndSend("contactQueue", "New contact created: " + dto.getName());
 
         return addressBookRepository.save(addressBook);
@@ -44,14 +44,14 @@ public class AddressBookService implements IAddressBookService {
     @Override
     @Cacheable(value = "addressBookCache") // Cache results
     public List<AddressBook> getAllEntries() {
-        getCurrentUserId(); // Ensure user is authenticated
+//        getCurrentUserId(); // Ensure user is authenticated
         return addressBookRepository.findAll();
     }
 
     @Override
     @Cacheable(value = "addressBookCache", key = "#id") // Cache specific entry by ID
     public AddressBook getEntryById(Long id) {
-        getCurrentUserId(); // Ensure user is authenticated
+//        getCurrentUserId(); // Ensure user is authenticated
         return addressBookRepository.findById(id).orElse(null);
     }
 
@@ -61,7 +61,7 @@ public class AddressBookService implements IAddressBookService {
             @CacheEvict(value = "addressBookCache", key = "#id")
     })
     public AddressBook updateEntry(Long id, AddressBookDTO dto) {
-        getCurrentUserId(); // Ensure user is authenticated
+//        getCurrentUserId(); // Ensure user is authenticated
         Optional<AddressBook> entry = addressBookRepository.findById(id);
         if (entry.isPresent()) {
             AddressBook addressBook = entry.get();
@@ -69,7 +69,7 @@ public class AddressBookService implements IAddressBookService {
             addressBook.setEmail(dto.getEmail());
             addressBook.setPhoneNumber(dto.getPhoneNumber());
 
-            // 🔔 Send RabbitMQ event for updating a contact
+            //  Send RabbitMQ event for updating a contact
             rabbitTemplate.convertAndSend("contactQueue", "Contact updated: " + dto.getName());
 
             return addressBookRepository.save(addressBook);
@@ -80,11 +80,11 @@ public class AddressBookService implements IAddressBookService {
     @Override
     @CacheEvict(value = "addressBookCache", key = "#id") // Remove from cache on delete
     public void deleteEntry(Long id) {
-        getCurrentUserId(); // Ensure user is authenticated
+//        getCurrentUserId(); // Ensure user is authenticated
         if (addressBookRepository.existsById(id)) {
             addressBookRepository.deleteById(id);
 
-            // 🔔 Send RabbitMQ event for deleting a contact
+            // Send RabbitMQ event for deleting a contact
             rabbitTemplate.convertAndSend("contactQueue", "Contact deleted with ID: " + id);
         } else {
             throw new RuntimeException("Entry with ID " + id + " not found");
